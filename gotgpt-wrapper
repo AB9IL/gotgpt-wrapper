@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# This script offers a seletion of catbot providers and runs
+# golang-based terminal gpt.
+
+ARCH="amd64"
+PROVIDERS_FILE="/usr/local/src/gotgpt/providers"
+EXECUTABLE="/usr/local/src/gotgpt/tgpt-linux-$ARCH"
+
+# read the list of providers
+IFS=$'\n' read -rd '' -a PROVIDERS <<<"$(cat "$PROVIDERS_FILE")"
+
+# select a provider
+CHOICE="$(for i in "${PROVIDERS[@]}"; do echo "$i"; done | sed '/^$/d;/#.*/d' | fzf --layout=reverse --header=Provider:)"
+
+# quit if no selection made
+[[ -z "$CHOICE" ]] && echo "No selection..." && exit 1
+
+# start a gpt chat session
+$EXECUTABLE --provider "$CHOICE" --multiline
+
+# exit after the session is finished
+exit 0
